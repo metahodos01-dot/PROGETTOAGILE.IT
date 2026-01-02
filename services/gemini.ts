@@ -1,33 +1,58 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-// Ensure process.env exists to prevent runtime crash in browser environments if not polyfilled
-const apiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : '';
+// Funzione robusta per recuperare la chiave API in diversi ambienti (Vite, CRA, Next.js, Standard)
+const getApiKey = () => {
+  // 1. Supporto per Vite (Standard moderno)
+  // @ts-ignore
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
+    // @ts-ignore
+    return import.meta.env.VITE_API_KEY;
+  }
+  
+  // 2. Supporto per Create React App
+  if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_KEY) {
+    return process.env.REACT_APP_API_KEY;
+  }
 
+  // 3. Supporto per Next.js
+  if (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_API_KEY) {
+    return process.env.NEXT_PUBLIC_API_KEY;
+  }
+
+  // 4. Fallback generico (Node.js o configurazioni custom)
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+
+  return '';
+};
+
+const apiKey = getApiKey();
 const ai = new GoogleGenAI({ apiKey: apiKey });
 
 const MISSING_KEY_ERROR = `
   <div class="bg-red-500/10 border border-red-500/20 p-8 rounded-[32px] text-center max-w-lg mx-auto mt-10">
-    <div class="text-5xl mb-6">🔑</div>
-    <h3 class="text-white font-black text-xl uppercase italic mb-4">Configurazione Mancante</h3>
+    <div class="text-5xl mb-6">🔒</div>
+    <h3 class="text-white font-black text-xl uppercase italic mb-4">Problema di Sicurezza Variabili</h3>
     <p class="text-gray-300 text-sm font-medium leading-relaxed mb-6">
-      L'applicazione non trova la chiave API di Google Gemini.
-      <br/>La chiave che hai fornito inizia correttamente con <code>AIza...</code>, ma deve essere inserita nelle impostazioni di Vercel.
+      L'applicazione non riesce a leggere la chiave API. <br/>
+      I browser bloccano le variabili che non hanno un prefisso pubblico.
     </p>
     
-    <div class="bg-[#1a1d24] p-4 rounded-xl border border-white/5 text-left mb-6">
-      <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Come risolvere su Vercel:</p>
-      <ol class="text-xs text-gray-400 space-y-2 list-decimal pl-4">
-        <li>Vai su <strong>Settings</strong> nel tuo progetto Vercel.</li>
-        <li>Clicca su <strong>Environment Variables</strong>.</li>
-        <li>Key: <code class="text-[#FF5A79] font-mono">API_KEY</code></li>
-        <li>Value: <em>Incolla la tua chiave AIza...</em></li>
-        <li>Salva e fai un <strong>Redeploy</strong> (o riavvia se in locale).</li>
+    <div class="bg-[#1a1d24] p-5 rounded-xl border border-white/5 text-left mb-6">
+      <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">SOLUZIONE SU VERCEL:</p>
+      <ol class="text-xs text-gray-400 space-y-3 list-decimal pl-4">
+        <li>Vai su <strong>Settings > Environment Variables</strong>.</li>
+        <li>Rinomina la variabile <code>API_KEY</code> in:</li>
+        <li class="bg-black/30 p-2 rounded text-[#FF5A79] font-mono font-bold">VITE_API_KEY</li>
+        <li>Il valore deve essere la tua chiave: <em>AIza...</em></li>
+        <li><strong>IMPORTANTE:</strong> Fai un nuovo Redeploy per applicare le modifiche.</li>
       </ol>
     </div>
 
     <div class="inline-block bg-[#FF5A79]/10 text-[#FF5A79] px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border border-[#FF5A79]/20">
-      Status: In attesa di API_KEY
+      Codice Errore: MISSING_ENV_PREFIX
     </div>
   </div>
 `;
