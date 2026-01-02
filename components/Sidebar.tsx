@@ -36,14 +36,22 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* App Header */}
       <div 
         onClick={onGoHome}
-        className="px-6 pt-8 pb-4 cursor-pointer hover:opacity-80 transition-opacity"
+        className="px-6 pt-8 pb-4 cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-4"
       >
-        <h1 className="text-xl font-black italic tracking-tighter text-white leading-none">
-          PROGETTOAGILE.AI
-        </h1>
-        <p className="text-[10px] font-bold text-[#FF5A79] uppercase tracking-[0.2em] mt-1">
-          By MetàHodòs
-        </p>
+        {/* LOGO QUI: Sostituisci src con il tuo URL o import locale */}
+        <img 
+          src="https://ui-avatars.com/api/?name=MH&background=FF5A79&color=fff&size=128" 
+          alt="MetàHodòs Logo" 
+          className="w-12 h-12 rounded-xl object-cover shadow-lg border border-white/10"
+        />
+        <div>
+          <h1 className="text-xl font-black italic tracking-tighter text-white leading-none">
+            PROGETTOAGILE.AI
+          </h1>
+          <p className="text-[10px] font-bold text-[#FF5A79] uppercase tracking-[0.2em] mt-1">
+            By MetàHodòs
+          </p>
+        </div>
       </div>
 
       <div className="p-6 space-y-8">
@@ -151,3 +159,4 @@ const Sidebar: React.FC<SidebarProps> = ({
 };
 
 export default Sidebar;
+    

@@ -3,26 +3,30 @@ import { GoogleGenAI } from "@google/genai";
 
 // Funzione robusta per recuperare la chiave API in diversi ambienti (Vite, CRA, Next.js, Standard)
 const getApiKey = () => {
-  // 1. Supporto per Vite (Standard moderno)
-  // @ts-ignore
-  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
+  try {
+    // 1. Supporto per Vite (Standard moderno per React su Vercel)
     // @ts-ignore
-    return import.meta.env.VITE_API_KEY;
-  }
-  
-  // 2. Supporto per Create React App
-  if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_KEY) {
-    return process.env.REACT_APP_API_KEY;
-  }
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
+      // @ts-ignore
+      return import.meta.env.VITE_API_KEY;
+    }
+    
+    // 2. Supporto per Next.js (se mai migrerai)
+    if (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_API_KEY) {
+      return process.env.NEXT_PUBLIC_API_KEY;
+    }
 
-  // 3. Supporto per Next.js
-  if (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_API_KEY) {
-    return process.env.NEXT_PUBLIC_API_KEY;
-  }
+    // 3. Supporto per Create React App
+    if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_KEY) {
+      return process.env.REACT_APP_API_KEY;
+    }
 
-  // 4. Fallback generico (Node.js o configurazioni custom)
-  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
-    return process.env.API_KEY;
+    // 4. Fallback (Spesso bloccato dai browser per sicurezza, ma utile in locale Node.js)
+    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+      return process.env.API_KEY;
+    }
+  } catch (e) {
+    console.error("Errore lettura env vars:", e);
   }
 
   return '';
@@ -33,26 +37,27 @@ const ai = new GoogleGenAI({ apiKey: apiKey });
 
 const MISSING_KEY_ERROR = `
   <div class="bg-red-500/10 border border-red-500/20 p-8 rounded-[32px] text-center max-w-lg mx-auto mt-10">
-    <div class="text-5xl mb-6">🔒</div>
-    <h3 class="text-white font-black text-xl uppercase italic mb-4">Problema di Sicurezza Variabili</h3>
+    <div class="text-5xl mb-6">🔑</div>
+    <h3 class="text-white font-black text-xl uppercase italic mb-4">Serve una Chiave API</h3>
     <p class="text-gray-300 text-sm font-medium leading-relaxed mb-6">
-      L'applicazione non riesce a leggere la chiave API. <br/>
-      I browser bloccano le variabili che non hanno un prefisso pubblico.
+      Per usare l'Intelligenza Artificiale, devi configurare una chiave Google Gemini valida.
     </p>
     
     <div class="bg-[#1a1d24] p-5 rounded-xl border border-white/5 text-left mb-6">
-      <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">SOLUZIONE SU VERCEL:</p>
+      <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3">ISTRUZIONI:</p>
       <ol class="text-xs text-gray-400 space-y-3 list-decimal pl-4">
-        <li>Vai su <strong>Settings > Environment Variables</strong>.</li>
-        <li>Rinomina la variabile <code>API_KEY</code> in:</li>
-        <li class="bg-black/30 p-2 rounded text-[#FF5A79] font-mono font-bold">VITE_API_KEY</li>
-        <li>Il valore deve essere la tua chiave: <em>AIza...</em></li>
-        <li><strong>IMPORTANTE:</strong> Fai un nuovo Redeploy per applicare le modifiche.</li>
+        <li>Ottieni una chiave gratuita qui: <br/>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[#FF5A79] underline font-bold hover:text-white transition-colors">Google AI Studio ↗</a>
+        </li>
+        <li>Vai su Vercel > Settings > Environment Variables.</li>
+        <li>Aggiungi la variabile: <code class="bg-black/30 px-1 rounded text-[#FF5A79]">VITE_API_KEY</code></li>
+        <li>Incolla la tua chiave (inizia con AIza...)</li>
+        <li>Fai un Redeploy.</li>
       </ol>
     </div>
 
     <div class="inline-block bg-[#FF5A79]/10 text-[#FF5A79] px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border border-[#FF5A79]/20">
-      Codice Errore: MISSING_ENV_PREFIX
+      Status: API_KEY_MISSING
     </div>
   </div>
 `;
