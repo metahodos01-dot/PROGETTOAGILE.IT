@@ -6,7 +6,22 @@ const apiKey = (typeof process !== 'undefined' && process.env) ? process.env.API
 
 const ai = new GoogleGenAI({ apiKey: apiKey });
 
+const MISSING_KEY_ERROR = `
+  <div class="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl text-center">
+    <div class="text-4xl mb-4">🔑</div>
+    <h3 class="text-red-500 font-bold mb-2 uppercase tracking-widest text-xs">Configurazione Mancante</h3>
+    <p class="text-red-400 text-sm font-medium">
+      La chiave API di Google Gemini non è stata trovata.
+    </p>
+    <p class="text-gray-500 text-xs mt-4">
+      Configura la variabile d'ambiente <code>API_KEY</code> nel tuo progetto (Vercel o .env).
+    </p>
+  </div>
+`;
+
 export const askAICoach = async (prompt: string, context: string) => {
+  if (!apiKey) return "Chiave API mancante. Configura API_KEY nelle variabili d'ambiente.";
+  
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
@@ -31,6 +46,8 @@ export const generateProductVision = async (data: {
   currentSolution: string;
   differentiation: string;
 }) => {
+  if (!apiKey) return MISSING_KEY_ERROR;
+
   try {
     const prompt = `
       Genera una Product Vision Statement professionale in italiano seguendo lo standard Agile.
@@ -70,6 +87,8 @@ export const generateProductVision = async (data: {
 export const generateObjectives = async (data: {
   deadline: string;
 }, visionContext?: string) => {
+  if (!apiKey) return MISSING_KEY_ERROR;
+
   try {
     const prompt = `
       Genera obiettivi SMART e OKR basati sul contesto strategico fornito.
@@ -97,6 +116,8 @@ export const generateObjectives = async (data: {
 };
 
 export const generateKPIDecomposition = async (strategicContext: string) => {
+  if (!apiKey) return MISSING_KEY_ERROR;
+
   try {
     const prompt = `
       Analizza il seguente obiettivo strategico e i relativi Key Results:
@@ -142,6 +163,8 @@ export const generateKPIDecomposition = async (strategicContext: string) => {
 };
 
 export const generateBacklog = async (strategicContext: string) => {
+  if (!apiKey) return MISSING_KEY_ERROR;
+
   try {
     const prompt = `
       Scomponi il seguente contesto strategico in un Product Backlog Agile (User Stories).
@@ -167,6 +190,8 @@ export const generateBacklog = async (strategicContext: string) => {
 };
 
 export const generateEstimates = async (backlogContext: string) => {
+  if (!apiKey) return MISSING_KEY_ERROR;
+
   try {
     const prompt = `
       Analizza le User Stories nel backlog seguente e proponi una stima per ciascuna.
@@ -196,6 +221,8 @@ export const generateTeamStructure = async (context: {
   backlog: string;
   teamMembers?: string;
 }) => {
+  if (!apiKey) return MISSING_KEY_ERROR;
+
   try {
     const prompt = `
       Definisci la struttura di un Agile Scrum Team ottimizzato per questo progetto.
@@ -235,6 +262,8 @@ export const generateTeamStructure = async (context: {
 };
 
 export const generateObeyaRendering = async (imageBase64: string, checklist: string[]) => {
+  if (!apiKey) return null;
+
   try {
     const prompt = `
       Edita questa immagine di una stanza per trasformarla in una Obeya Room Agile professionale.
@@ -282,6 +311,8 @@ export const generateRoadmapMVP = async (context: {
   objectives: string;
   backlog: string;
 }) => {
+  if (!apiKey) return MISSING_KEY_ERROR;
+
   try {
     const prompt = `
       Analizza i seguenti dati di progetto per definire un MVP (Minimum Viable Product) e una Roadmap di rilascio.
