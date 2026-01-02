@@ -1,7 +1,10 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Ensure process.env exists to prevent runtime crash in browser environments if not polyfilled
+const apiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : '';
+
+const ai = new GoogleGenAI({ apiKey: apiKey });
 
 export const askAICoach = async (prompt: string, context: string) => {
   try {
@@ -17,7 +20,7 @@ export const askAICoach = async (prompt: string, context: string) => {
     return response.text || "Non sono riuscito a elaborare un feedback in questo momento.";
   } catch (error) {
     console.error("AI Error:", error);
-    return "Si è verificato un errore nella connessione con il Coach AI.";
+    return "Si è verificato un errore nella connessione con il Coach AI. Verifica la API KEY.";
   }
 };
 
