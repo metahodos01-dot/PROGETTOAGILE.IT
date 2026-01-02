@@ -1,5 +1,5 @@
 {
-  "name": "Agile Academy AI Clone",
+  "name": "PROGETTOAGILE.AI",
   "description": "A sophisticated Agile training platform featuring session timers, module tracking, and an integrated AI laboratory for practical workshops.",
   "requestFramePermissions": [
     "microphone",

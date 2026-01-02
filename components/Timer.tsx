@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 const Timer: React.FC = () => {
   const [seconds, setSeconds] = useState(2700);
   const [isActive, setIsActive] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editMinutes, setEditMinutes] = useState('45');
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -20,9 +22,26 @@ const Timer: React.FC = () => {
   }, [isActive, seconds]);
 
   const toggle = () => setIsActive(!isActive);
+  
   const reset = () => {
     setIsActive(false);
-    setSeconds(2700);
+    setSeconds(parseInt(editMinutes) * 60);
+  };
+
+  const handleTimeClick = () => {
+    if (!isActive) {
+      setIsEditing(true);
+      setEditMinutes(Math.floor(seconds / 60).toString());
+    }
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const mins = parseInt(editMinutes);
+    if (!isNaN(mins) && mins > 0) {
+      setSeconds(mins * 60);
+      setIsEditing(false);
+    }
   };
 
   const formatTime = (s: number) => {
@@ -34,14 +53,35 @@ const Timer: React.FC = () => {
   return (
     <div className="bg-[#4B4E54] rounded-[32px] p-6 shadow-2xl border border-white/5 flex flex-col items-center">
       <div className="text-[10px] font-black text-[#FF5A79] uppercase tracking-[0.3em] mb-4">Timebox</div>
-      <div className="text-6xl font-mono font-black text-white mb-6 tracking-tight flex items-center">
-        {formatTime(seconds).split(':').map((part, i) => (
-          <React.Fragment key={i}>
-            <span className="w-20 text-center">{part}</span>
-            {i === 0 && <span className="opacity-30 -mt-1">:</span>}
-          </React.Fragment>
-        ))}
-      </div>
+      
+      {isEditing ? (
+        <form onSubmit={handleEditSubmit} className="mb-6 flex items-center justify-center">
+          <input 
+            type="number" 
+            min="1" 
+            max="180"
+            autoFocus
+            value={editMinutes}
+            onChange={(e) => setEditMinutes(e.target.value)}
+            onBlur={handleEditSubmit}
+            className="w-32 bg-white/10 text-white text-5xl font-mono font-black text-center rounded-xl p-2 focus:outline-none focus:ring-2 focus:ring-[#FF5A79]"
+          />
+          <span className="text-white ml-2 text-sm font-bold uppercase">min</span>
+        </form>
+      ) : (
+        <div 
+          onClick={handleTimeClick}
+          className="text-6xl font-mono font-black text-white mb-6 tracking-tight flex items-center cursor-pointer hover:opacity-80 transition-opacity title='Clicca per modificare'"
+        >
+          {formatTime(seconds).split(':').map((part, i) => (
+            <React.Fragment key={i}>
+              <span className="w-20 text-center">{part}</span>
+              {i === 0 && <span className="opacity-30 -mt-1">:</span>}
+            </React.Fragment>
+          ))}
+        </div>
+      )}
+
       <div className="flex space-x-2 w-full">
         <button 
           onClick={toggle}

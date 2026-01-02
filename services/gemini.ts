@@ -191,11 +191,19 @@ export const generateEstimates = async (backlogContext: string) => {
 export const generateTeamStructure = async (context: {
   strategy: string;
   backlog: string;
+  teamMembers?: string;
 }) => {
   try {
     const prompt = `
-      Definisci la struttura di un Agile Scrum Team basato sui seguenti dati:
+      Definisci la struttura di un Agile Scrum Team ottimizzato per questo progetto.
       
+      ${context.teamMembers ? `
+      MEMBRI DEL TEAM ESISTENTI (Dal Registro Sessione):
+      ${context.teamMembers}
+      
+      ISTRUZIONE: Assegna ruoli e responsabilità specifiche a queste persone in base alle loro skills dichiarate. Se mancano competenze critiche, segnala i ruoli vacanti.
+      ` : ''}
+
       OBIETTIVI STRATEGICI:
       ${context.strategy}
       
@@ -204,6 +212,8 @@ export const generateTeamStructure = async (context: {
 
       REQUISITI DI OUTPUT:
       - Restituisci l'output ESCLUSIVAMENTE in formato HTML.
+      - Usa card visive per ogni membro del team.
+      - Evidenzia chiaramente "Chi fa cosa".
     `;
 
     const response = await ai.models.generateContent({

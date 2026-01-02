@@ -2,96 +2,149 @@
 import React from 'react';
 import { MODULES } from '../constants';
 
+interface ProjectSummary {
+  id: string;
+  name: string;
+  updatedAt: string;
+}
+
 interface SidebarProps {
   activeModuleId: string;
   onSelectModule: (id: string) => void;
+  onGoHome: () => void;
+  onOpenRegister: () => void; // Apre il registro con i dati attuali (Edit)
+  onNewProject: () => void;   // Apre il registro vuoto (New)
+  projects: ProjectSummary[];
+  currentProjectId: string | null;
+  onSwitchProject: (projectId: string) => void;
+  onDeleteProject: (projectId: string) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeModuleId, onSelectModule }) => {
+const Sidebar: React.FC<SidebarProps> = ({ 
+  activeModuleId, 
+  onSelectModule, 
+  onGoHome, 
+  onOpenRegister,
+  onNewProject,
+  projects,
+  currentProjectId,
+  onSwitchProject,
+  onDeleteProject
+}) => {
   return (
     <aside className="w-[340px] bg-[#4B4E54] h-screen text-white flex flex-col shrink-0 overflow-y-auto custom-scrollbar">
+      {/* App Header */}
+      <div 
+        onClick={onGoHome}
+        className="px-6 pt-8 pb-4 cursor-pointer hover:opacity-80 transition-opacity"
+      >
+        <h1 className="text-xl font-black italic tracking-tighter text-white leading-none">
+          PROGETTOAGILE.AI
+        </h1>
+        <p className="text-[10px] font-bold text-[#FF5A79] uppercase tracking-[0.2em] mt-1">
+          By MetàHodòs
+        </p>
+      </div>
+
       <div className="p-6 space-y-8">
-        
-        {/* Materiali Extra */}
-        <section>
-          <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 px-2">Materiali Extra</h2>
-          <button className="w-full bg-[#5A5D63] hover:bg-[#66696F] p-4 rounded-2xl flex items-center space-x-3 transition-all border border-white/5">
-            <span className="text-lg">🥜</span>
-            <span className="text-sm font-bold text-gray-200">Agile in a Nutshell</span>
+
+        {/* Project Selector & Actions */}
+        <section className="space-y-3">
+          <div className="flex justify-between items-center px-1">
+            <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">I Tuoi Progetti</h2>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <div className="relative flex-1">
+               <select 
+                 value={currentProjectId || ''}
+                 onChange={(e) => onSwitchProject(e.target.value)}
+                 className="w-full bg-[#5A5D63] appearance-none p-4 rounded-2xl text-sm font-bold border border-white/5 focus:outline-none cursor-pointer pr-10 hover:bg-[#66696F] transition-colors shadow-sm text-white truncate"
+               >
+                 {projects.length === 0 && <option value="" disabled>Caricamento...</option>}
+                 {projects.map((p) => (
+                   <option key={p.id} value={p.id} className="text-black">
+                     {p.name}
+                   </option>
+                 ))}
+               </select>
+               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+               </div>
+            </div>
+            {currentProjectId && (
+              <button 
+                type="button"
+                onClick={() => onDeleteProject(currentProjectId)}
+                className="bg-[#5A5D63] p-4 rounded-2xl hover:bg-red-500/20 hover:text-red-500 transition-colors border border-white/5 group"
+                title="Elimina Progetto Corrente"
+              >
+                <svg className="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            )}
+          </div>
+
+          {/* New Project Button */}
+          <button 
+            type="button"
+            onClick={onNewProject}
+            className="w-full bg-white/5 hover:bg-white/10 p-3 rounded-2xl flex items-center justify-center space-x-2 transition-all border border-white/5 border-dashed group"
+          >
+            <span className="text-lg text-green-400 group-hover:scale-110 transition-transform">+</span>
+            <span className="text-xs font-black text-gray-300 uppercase tracking-widest group-hover:text-white">Crea Nuovo Progetto</span>
           </button>
         </section>
-
-        {/* Percorso Formativo */}
-        <section>
-          <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 px-2">Percorso Formativo</h2>
-          
-          <div className="space-y-4">
-            {/* Trainer View Dropdown */}
-            <div className="relative">
-              <select className="w-full bg-[#5A5D63] appearance-none p-4 rounded-2xl text-sm font-bold border border-white/5 focus:outline-none cursor-pointer pr-10">
-                <option>Vista Trainer (Tutti)</option>
-              </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-              </div>
-            </div>
-
-            {/* Registro Sessione */}
-            <button className="w-full bg-[#5A5D63] hover:bg-[#66696F] p-4 rounded-2xl flex items-center space-x-3 transition-all border border-white/5">
-              <span className="text-lg">📝</span>
-              <span className="text-sm font-bold text-gray-200">Registro Sessione</span>
-            </button>
-
-            {/* Modules List */}
-            <div className="space-y-3 pt-4">
-              {MODULES.map((mod, index) => {
-                const isActive = activeModuleId === mod.id;
-                const moduleNumber = index + 1;
-                
-                return (
-                  <button
-                    key={mod.id}
-                    onClick={() => onSelectModule(mod.id)}
-                    className={`w-full text-left rounded-[20px] p-5 relative overflow-hidden transition-all group ${
-                      isActive 
-                        ? 'bg-white text-slate-900 shadow-xl' 
-                        : 'bg-[#5A5D63] border border-white/5 hover:bg-[#66696F]'
-                    }`}
-                  >
-                    {/* Background Ghost Number */}
-                    <span className={`absolute -right-2 -bottom-4 text-8xl font-black italic select-none pointer-events-none opacity-[0.07] ${isActive ? 'text-black' : 'text-white'}`}>
-                      {moduleNumber}
-                    </span>
-
-                    <div className="flex items-center space-x-2 mb-3 relative z-10">
-                      <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-tighter ${
-                        isActive ? 'bg-[#FF5A79] text-white' : 'bg-[#6E7177] text-gray-300'
-                      }`}>
-                        Giorno {mod.day}
-                      </span>
-                      <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-tighter ${
-                        isActive ? 'bg-[#F1F3F5] text-slate-500' : 'bg-[#6E7177] text-gray-300'
-                      }`}>
-                        {mod.type}
-                      </span>
-                    </div>
-
-                    <h3 className={`text-[13px] font-black uppercase leading-tight tracking-tight relative z-10 pr-6 ${
-                      isActive ? 'text-slate-800' : 'text-white'
-                    }`}>
-                      {mod.title.split('. ')[1]}
-                    </h3>
-
-                    {/* Active Accent Line */}
-                    {isActive && (
-                      <div className="absolute bottom-4 left-5 w-8 h-1 bg-[#FF5A79] rounded-full"></div>
-                    )}
-                  </button>
-                );
-              })}
+        
+        {/* Registro Progetti Agile Button (Edit Mode) */}
+        <button 
+          onClick={onOpenRegister}
+          className="w-full bg-[#FF5A79] hover:bg-[#ff4065] p-4 rounded-2xl flex items-center justify-between transition-all shadow-lg group"
+        >
+          <div className="flex items-center space-x-3">
+            <span className="text-lg bg-white/20 w-8 h-8 rounded-full flex items-center justify-center">📝</span>
+            <div className="text-left">
+              <span className="block text-[10px] font-black text-white/80 uppercase tracking-wider">Configurazione</span>
+              <span className="block text-sm font-bold text-white">Registro Team & Dati</span>
             </div>
           </div>
-        </section>
+          <span className="text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all">→</span>
+        </button>
+
+        {/* Modules List */}
+        <div className="space-y-3 pb-20">
+          {MODULES.map((mod, index) => {
+            const isActive = activeModuleId === mod.id;
+            const moduleNumber = index; // Keep 0-based for Mindset as 0
+            
+            return (
+              <button
+                key={mod.id}
+                onClick={() => onSelectModule(mod.id)}
+                className={`w-full text-left rounded-[20px] p-5 relative overflow-hidden transition-all group ${
+                  isActive 
+                    ? 'bg-white text-slate-900 shadow-xl' 
+                    : 'bg-[#5A5D63] border border-white/5 hover:bg-[#66696F]'
+                }`}
+              >
+                {/* Background Ghost Number - VISIBILITY INCREASED AND MOVED LEFT */}
+                <span className={`absolute right-4 -bottom-4 text-8xl font-black italic select-none pointer-events-none opacity-20 ${isActive ? 'text-black' : 'text-white'}`}>
+                  {moduleNumber}
+                </span>
+
+                <h3 className={`text-[13px] font-black uppercase leading-tight tracking-tight relative z-10 pr-6 ${
+                  isActive ? 'text-slate-800' : 'text-white'
+                }`}>
+                  {mod.title.split('. ')[1]}
+                </h3>
+
+                {/* Active Accent Line */}
+                {isActive && (
+                  <div className="absolute bottom-4 left-5 w-8 h-1 bg-[#FF5A79] rounded-full"></div>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </aside>
   );

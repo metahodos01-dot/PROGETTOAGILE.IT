@@ -101,5 +101,15 @@ export const MODULES: Module[] = [
     description: 'Gestione del ciclo di vita dello Sprint: Planning, Daily, Review e Retro.',
     objectives: ['Sprint Planning', 'Daily Scrum', 'Retrospective'],
     quote: 'Iterare per innovare.'
+  },
+  {
+    id: 'f10',
+    day: 4,
+    type: 'SPECIALIST',
+    title: '10. STATISTICHE & DATA DRIVEN',
+    tagline: 'Analisi avanzata e miglioramento continuo.',
+    description: 'Dashboard completa con Year to Date, Burnup Chart e analisi della Velocity.',
+    objectives: ['Data Driven Decision', 'Trend Analysis', 'Forecasting'],
+    quote: 'In God we trust, all others must bring data.'
   }
 ];
