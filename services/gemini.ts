@@ -7,20 +7,33 @@ const apiKey = (typeof process !== 'undefined' && process.env) ? process.env.API
 const ai = new GoogleGenAI({ apiKey: apiKey });
 
 const MISSING_KEY_ERROR = `
-  <div class="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl text-center">
-    <div class="text-4xl mb-4">🔑</div>
-    <h3 class="text-red-500 font-bold mb-2 uppercase tracking-widest text-xs">Configurazione Mancante</h3>
-    <p class="text-red-400 text-sm font-medium">
-      La chiave API di Google Gemini non è stata trovata.
+  <div class="bg-red-500/10 border border-red-500/20 p-8 rounded-[32px] text-center max-w-lg mx-auto mt-10">
+    <div class="text-5xl mb-6">🔑</div>
+    <h3 class="text-white font-black text-xl uppercase italic mb-4">Configurazione Mancante</h3>
+    <p class="text-gray-300 text-sm font-medium leading-relaxed mb-6">
+      L'applicazione non trova la chiave API di Google Gemini.
+      <br/>La chiave che hai fornito inizia correttamente con <code>AIza...</code>, ma deve essere inserita nelle impostazioni di Vercel.
     </p>
-    <p class="text-gray-500 text-xs mt-4">
-      Configura la variabile d'ambiente <code>API_KEY</code> nel tuo progetto (Vercel o .env).
-    </p>
+    
+    <div class="bg-[#1a1d24] p-4 rounded-xl border border-white/5 text-left mb-6">
+      <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Come risolvere su Vercel:</p>
+      <ol class="text-xs text-gray-400 space-y-2 list-decimal pl-4">
+        <li>Vai su <strong>Settings</strong> nel tuo progetto Vercel.</li>
+        <li>Clicca su <strong>Environment Variables</strong>.</li>
+        <li>Key: <code class="text-[#FF5A79] font-mono">API_KEY</code></li>
+        <li>Value: <em>Incolla la tua chiave AIza...</em></li>
+        <li>Salva e fai un <strong>Redeploy</strong> (o riavvia se in locale).</li>
+      </ol>
+    </div>
+
+    <div class="inline-block bg-[#FF5A79]/10 text-[#FF5A79] px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border border-[#FF5A79]/20">
+      Status: In attesa di API_KEY
+    </div>
   </div>
 `;
 
 export const askAICoach = async (prompt: string, context: string) => {
-  if (!apiKey) return "Chiave API mancante. Configura API_KEY nelle variabili d'ambiente.";
+  if (!apiKey) return MISSING_KEY_ERROR;
   
   try {
     const response = await ai.models.generateContent({
