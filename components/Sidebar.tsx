@@ -18,6 +18,7 @@ interface SidebarProps {
   currentProjectId: string | null;
   onSwitchProject: (projectId: string) => void;
   onDeleteProject: (projectId: string) => void;
+  onExportProject: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -29,7 +30,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   projects,
   currentProjectId,
   onSwitchProject,
-  onDeleteProject
+  onDeleteProject,
+  onExportProject
 }) => {
   return (
     <aside className="w-[340px] bg-[#4B4E54] h-screen text-white flex flex-col shrink-0 overflow-y-auto custom-scrollbar">
@@ -41,7 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {/* LOGO QUI: Sostituisci src con il tuo URL o import locale */}
         <img 
           src="https://ui-avatars.com/api/?name=MH&background=FF5A79&color=fff&size=128" 
-          alt="MetàHodòs Logo" 
+          alt="Metàhodos Logo" 
           className="w-12 h-12 rounded-xl object-cover shadow-lg border border-white/10"
         />
         <div>
@@ -81,14 +83,24 @@ const Sidebar: React.FC<SidebarProps> = ({
                </div>
             </div>
             {currentProjectId && (
-              <button 
-                type="button"
-                onClick={() => onDeleteProject(currentProjectId)}
-                className="bg-[#5A5D63] p-4 rounded-2xl hover:bg-red-500/20 hover:text-red-500 transition-colors border border-white/5 group"
-                title="Elimina Progetto Corrente"
-              >
-                <svg className="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-              </button>
+              <>
+                <button 
+                  type="button"
+                  onClick={onExportProject}
+                  className="bg-[#5A5D63] p-4 rounded-2xl hover:bg-green-500/20 hover:text-green-500 transition-colors border border-white/5 group"
+                  title="Scarica Backup JSON"
+                >
+                  <svg className="w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </button>
+                <button 
+                  type="button"
+                  onClick={() => onDeleteProject(currentProjectId)}
+                  className="bg-[#5A5D63] p-4 rounded-2xl hover:bg-red-500/20 hover:text-red-500 transition-colors border border-white/5 group"
+                  title="Elimina Progetto Corrente"
+                >
+                  <svg className="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+              </>
             )}
           </div>
 
@@ -159,4 +171,3 @@ const Sidebar: React.FC<SidebarProps> = ({
 };
 
 export default Sidebar;
-    
