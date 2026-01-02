@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="it">
   <head>
@@ -12,6 +13,7 @@
         background-color: #ffffff;
         color: #1e293b;
       }
+      /* Custom scrollbar for sidebar */
       .custom-scrollbar::-webkit-scrollbar {
         width: 4px;
       }
@@ -19,23 +21,8 @@
         background: transparent;
       }
       .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 10px;
-      }
-      @keyframes spin-slow {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-      .animate-spin-slow {
-        animation: spin-slow 12s linear infinite;
-      }
-      /* Vision HTML styling */
-      .vision-output strong {
-        color: #FF5A79;
-        font-weight: 800;
-      }
-      .vision-output p {
-        margin-bottom: 1.5rem;
       }
     </style>
     <script type="importmap">
