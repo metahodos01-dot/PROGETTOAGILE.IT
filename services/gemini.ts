@@ -1,34 +1,26 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-// Funzione robusta per recuperare la chiave API in diversi ambienti (Vite, CRA, Next.js, Standard)
+// Funzione robusta per recuperare la chiave API in diversi ambienti
 const getApiKey = () => {
   try {
-    // 1. Supporto per Vite (Standard moderno per React su Vercel)
     // @ts-ignore
     if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
       // @ts-ignore
       return import.meta.env.VITE_API_KEY;
     }
-    
-    // 2. Supporto per Next.js (se mai migrerai)
     if (typeof process !== 'undefined' && process.env && process.env.NEXT_PUBLIC_API_KEY) {
       return process.env.NEXT_PUBLIC_API_KEY;
     }
-
-    // 3. Supporto per Create React App
     if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_KEY) {
       return process.env.REACT_APP_API_KEY;
     }
-
-    // 4. Fallback (Spesso bloccato dai browser per sicurezza, ma utile in locale Node.js)
     if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
       return process.env.API_KEY;
     }
   } catch (e) {
     console.error("Errore lettura env vars:", e);
   }
-
   return '';
 };
 
@@ -72,7 +64,6 @@ export const askAICoach = async (prompt: string, context: string) => {
       config: {
         systemInstruction: "Sei l'Agile Coach di Metàhodos. Il tuo compito è analizzare gli output dei workshop dei partecipanti e fornire feedback brevi, sfidanti e pratici. Non dare soluzioni dirette, ma guida i team verso la mentalità agile corretta. Parla in modo professionale ma incoraggiante.",
         temperature: 0.8,
-        thinkingConfig: { thinkingBudget: 1000 }
       }
     });
     return response.text || "Non sono riuscito a elaborare un feedback in questo momento.";
