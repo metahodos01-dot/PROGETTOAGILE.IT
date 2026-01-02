@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -9,7 +8,7 @@ export const askAICoach = async (prompt: string, context: string) => {
       model: 'gemini-3-pro-preview',
       contents: `Contesto del modulo formativo: ${context}\n\nInput dell'utente: ${prompt}`,
       config: {
-        systemInstruction: "Sei l'Agile Coach di Metàhodos. Il tuo compito è analizzare gli output dei workshop dei partecipanti e fornire feedback brevi, sfidanti e pratici. Non dare soluzioni dirette, ma guida i team verso la mentalità agile corretta. Parla in modo professionale ma incoraggiante.",
+        systemInstruction: "Sei un Agile Coach esperto. Il tuo compito è analizzare gli output dei workshop dei partecipanti e fornire feedback brevi, sfidanti e pratici. Non dare soluzioni dirette, ma guida i team verso la mentalità agile corretta. Parla in modo professionale ma incoraggiante.",
         temperature: 0.8,
         thinkingConfig: { thinkingBudget: 1000 }
       }
