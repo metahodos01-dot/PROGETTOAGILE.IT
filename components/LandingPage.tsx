@@ -183,6 +183,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           <p>Francesco De Sario – Via Albini 27, 40137 Bologna (BO)</p>
           <p>P.Iva: 03819481205 – C.F.: DSRFNC69B10M082I – CID: KRRH6B9</p>
           <p>Tel. +39 328 268 2183 – effeone@pec.it</p>
+          <p className="mt-4 text-[#FF5A79] opacity-50">v1.6</p>
         </div>
       </footer>
     </div>

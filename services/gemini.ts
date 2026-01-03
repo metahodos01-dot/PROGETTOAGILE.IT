@@ -295,41 +295,56 @@ export const generateTeamStructure = async (context: {
   }
 };
 
-export const generateObeyaRendering = async (imageBase64: string, checklist: string[]) => {
+export const generateObeyaRendering = async (imageBase64: string | null, checklist: string[]) => {
   if (!apiKey) return null;
 
   try {
-    const prompt = `
-      Edita questa immagine di una stanza per trasformarla in una Obeya Room Agile professionale.
-      Aggiungi sulle pareti e negli spazi i seguenti elementi della checklist:
-      ${checklist.join(", ")}
+    const hasValidImage = imageBase64 && imageBase64.startsWith('data:image');
+    const parts: any[] = [];
+    
+    if (hasValidImage) {
+        const prompt = `
+          Edita questa immagine di una stanza per trasformarla in una Obeya Room Agile professionale.
+          Aggiungi sulle pareti e negli spazi i seguenti elementi della checklist:
+          ${checklist.join(", ")}
 
-      REQUISITI VISUALI:
-      - Stile moderno, professionale, alta luminosità.
-      - Lavagne bianche (whiteboards) con post-it colorati (Kanban board).
-      - Grafici di KPI stampati o visualizzati su schermi.
-      - Product Vision board in evidenza.
-      - Spazi per il team.
-      
-      Restituisci l'immagine modificata.
-    `;
-
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image',
-      contents: {
-        parts: [
-          {
+          REQUISITI VISUALI:
+          - Stile moderno, professionale, alta luminosità.
+          - Lavagne bianche (whiteboards) con post-it colorati (Kanban board).
+          - Grafici di KPI stampati o visualizzati su schermi.
+          - Product Vision board in evidenza.
+          - Spazi per il team.
+          
+          Restituisci l'immagine modificata.
+        `;
+        parts.push({
             inlineData: {
               data: imageBase64.split(',')[1],
               mimeType: 'image/jpeg',
             },
-          },
-          { text: prompt },
-        ],
+        });
+        parts.push({ text: prompt });
+    } else {
+        const prompt = `
+          Genera un'immagine fotorealistica di una Obeya Room Agile (sala di gestione visiva del progetto).
+          
+          L'ambiente deve essere un ufficio moderno e luminoso.
+          Sulle pareti devono essere visibili chiaramente:
+          ${checklist.join(", ")}
+          
+          Dettagli: Post-it colorati, grafici di andamento, lavagne bianche, atmosfera collaborativa.
+        `;
+        parts.push({ text: prompt });
+    }
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: {
+        parts: parts,
       },
     });
 
-    for (const part of response.candidates[0].content.parts) {
+    for (const part of response.candidates?.[0]?.content?.parts || []) {
       if (part.inlineData) {
         return `data:image/png;base64,${part.inlineData.data}`;
       }
@@ -410,5 +425,47 @@ export const generateRoadmapMVP = async (context: {
   } catch (error) {
     console.error("Roadmap AI Error:", error);
     return "Errore tecnico durante la generazione della Roadmap.";
+  }
+};
+
+export const generateSprintTasks = async (stories: string) => {
+  if (!apiKey) return [];
+
+  try {
+    const prompt = `
+      Analizza le seguenti User Stories selezionate per lo Sprint:
+      ${stories}
+
+      ISTRUZIONI:
+      Crea una lista di Task Tecnici concreti necessari per implementare queste storie.
+      Assegna ogni task a un ruolo generico (es. Backend, Frontend, Design, Testing).
+      
+      FORMATO JSON OBBLIGATORIO:
+      Restituisci ESCLUSIVAMENTE un array JSON valido. Non usare markdown, non usare blocchi codice. Solo il raw JSON.
+      Esempio:
+      [
+        { "title": "Configurare DB schema per utenti", "assignedTo": "Backend" },
+        { "title": "Creare wireframe dashboard", "assignedTo": "Design" }
+      ]
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        temperature: 0.7,
+      }
+    });
+    
+    const text = response.text;
+    if (!text) return [];
+    
+    // Clean potential markdown just in case, though mimeType helps
+    const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(cleanText);
+  } catch (error) {
+    console.error("Sprint Task Generation Error:", error);
+    return [];
   }
 };

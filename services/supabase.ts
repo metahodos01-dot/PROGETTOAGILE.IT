@@ -21,7 +21,12 @@ export interface DBProjectState {
   stored_outputs: {
     vision?: string;
     objectives?: string;
+    kpi?: string;
+    team?: string;
+    obeya?: string;
     backlog?: string;
+    estimates?: string;
+    roadmap?: string;
   };
   active_module_id: string;
   team_availability: Record<string, number>;

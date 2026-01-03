@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { MODULES } from '../constants';
 
 interface ProjectSummary {
@@ -19,6 +19,7 @@ interface SidebarProps {
   onSwitchProject: (projectId: string) => void;
   onDeleteProject: (projectId: string) => void;
   onExportProject: () => void;
+  onImportProject: (file: File) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -31,27 +32,41 @@ const Sidebar: React.FC<SidebarProps> = ({
   currentProjectId,
   onSwitchProject,
   onDeleteProject,
-  onExportProject
+  onExportProject,
+  onImportProject
 }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      onImportProject(e.target.files[0]);
+    }
+    // Reset value to allow selecting same file again
+    e.target.value = '';
+  };
+
   return (
-    <aside className="w-[340px] bg-[#4B4E54] h-screen text-white flex flex-col shrink-0 overflow-y-auto custom-scrollbar">
+    <aside className="w-[340px] bg-[#4B4E54] h-screen text-white flex flex-col shrink-0 overflow-y-auto custom-scrollbar border-r border-white/5">
       {/* App Header */}
       <div 
         onClick={onGoHome}
         className="px-6 pt-8 pb-4 cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-4"
       >
-        {/* LOGO QUI: Sostituisci src con il tuo URL o import locale */}
-        <img 
-          src="https://ui-avatars.com/api/?name=MH&background=FF5A79&color=fff&size=128" 
-          alt="Metàhodos Logo" 
-          className="w-12 h-12 rounded-xl object-cover shadow-lg border border-white/10"
-        />
+        {/* LOGO */}
+        <div className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-[#FF5A79] to-amber-500 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-200"></div>
+          <img 
+            src="https://ui-avatars.com/api/?name=MH&background=FF5A79&color=fff&size=128" 
+            alt="Metàhodos Logo" 
+            className="relative w-12 h-12 rounded-xl object-cover shadow-lg border border-white/10"
+          />
+        </div>
         <div>
           <h1 className="text-xl font-black italic tracking-tighter text-white leading-none">
             PROGETTOAGILE.AI
           </h1>
           <p className="text-[10px] font-bold text-[#FF5A79] uppercase tracking-[0.2em] mt-1">
-            By MetàHodòs
+            By MetàHodòs v1.6
           </p>
         </div>
       </div>
@@ -69,7 +84,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                <select 
                  value={currentProjectId || ''}
                  onChange={(e) => onSwitchProject(e.target.value)}
-                 className="w-full bg-[#5A5D63] appearance-none p-4 rounded-2xl text-sm font-bold border border-white/5 focus:outline-none cursor-pointer pr-10 hover:bg-[#66696F] transition-colors shadow-sm text-white truncate"
+                 className="w-full bg-[#5A5D63] appearance-none p-4 rounded-2xl text-sm font-bold border border-white/5 focus:outline-none cursor-pointer pr-10 hover:bg-[#66696F] transition-colors shadow-lg text-white truncate"
                >
                  {projects.length === 0 && <option value="" disabled>Caricamento...</option>}
                  {projects.map((p) => (
@@ -87,7 +102,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <button 
                   type="button"
                   onClick={onExportProject}
-                  className="bg-[#5A5D63] p-4 rounded-2xl hover:bg-green-500/20 hover:text-green-500 transition-colors border border-white/5 group"
+                  className="bg-[#5A5D63] p-4 rounded-2xl hover:bg-green-500/20 hover:text-green-500 transition-colors border border-white/5 group shadow-lg"
                   title="Scarica Backup JSON"
                 >
                   <svg className="w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -95,7 +110,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <button 
                   type="button"
                   onClick={() => onDeleteProject(currentProjectId)}
-                  className="bg-[#5A5D63] p-4 rounded-2xl hover:bg-red-500/20 hover:text-red-500 transition-colors border border-white/5 group"
+                  className="bg-[#5A5D63] p-4 rounded-2xl hover:bg-red-500/20 hover:text-red-500 transition-colors border border-white/5 group shadow-lg"
                   title="Elimina Progetto Corrente"
                 >
                   <svg className="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -104,21 +119,39 @@ const Sidebar: React.FC<SidebarProps> = ({
             )}
           </div>
 
-          {/* New Project Button */}
-          <button 
-            type="button"
-            onClick={onNewProject}
-            className="w-full bg-white/5 hover:bg-white/10 p-3 rounded-2xl flex items-center justify-center space-x-2 transition-all border border-white/5 border-dashed group"
-          >
-            <span className="text-lg text-green-400 group-hover:scale-110 transition-transform">+</span>
-            <span className="text-xs font-black text-gray-300 uppercase tracking-widest group-hover:text-white">Crea Nuovo Progetto</span>
-          </button>
+          {/* New Project & Import Buttons */}
+          <div className="flex space-x-2">
+            <button 
+              type="button"
+              onClick={onNewProject}
+              className="flex-1 bg-white/5 hover:bg-white/10 p-3 rounded-2xl flex items-center justify-center space-x-2 transition-all border border-white/10 border-dashed group hover:border-green-500/50"
+            >
+              <span className="text-lg text-green-400 group-hover:scale-110 transition-transform">+</span>
+              <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest group-hover:text-white">Nuovo</span>
+            </button>
+
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept=".json"
+              className="hidden"
+            />
+            <button 
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="bg-white/5 hover:bg-white/10 p-3 rounded-2xl flex items-center justify-center transition-all border border-white/10 border-dashed group hover:border-blue-500/50"
+              title="Importa Progetto da JSON"
+            >
+               <span className="text-lg text-blue-400 group-hover:scale-110 transition-transform">↓</span>
+            </button>
+          </div>
         </section>
         
         {/* Registro Progetti Agile Button (Edit Mode) */}
         <button 
           onClick={onOpenRegister}
-          className="w-full bg-[#FF5A79] hover:bg-[#ff4065] p-4 rounded-2xl flex items-center justify-between transition-all shadow-lg group"
+          className="w-full bg-[#FF5A79] hover:bg-[#ff4065] p-4 rounded-2xl flex items-center justify-between transition-all shadow-xl group border border-[#FF5A79]"
         >
           <div className="flex items-center space-x-3">
             <span className="text-lg bg-white/20 w-8 h-8 rounded-full flex items-center justify-center">📝</span>
@@ -142,11 +175,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => onSelectModule(mod.id)}
                 className={`w-full text-left rounded-[20px] p-5 relative overflow-hidden transition-all group ${
                   isActive 
-                    ? 'bg-white text-slate-900 shadow-xl' 
+                    ? 'bg-gradient-to-r from-white to-gray-200 text-slate-900 shadow-xl scale-[1.02]' 
                     : 'bg-[#5A5D63] border border-white/5 hover:bg-[#66696F]'
                 }`}
               >
-                {/* Background Ghost Number - VISIBILITY INCREASED AND MOVED LEFT */}
+                {/* Background Ghost Number */}
                 <span className={`absolute right-4 -bottom-4 text-8xl font-black italic select-none pointer-events-none opacity-20 ${isActive ? 'text-black' : 'text-white'}`}>
                   {moduleNumber}
                 </span>
